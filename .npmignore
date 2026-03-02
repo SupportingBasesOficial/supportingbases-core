@@ -1,0 +1,8 @@
+src/
+tests/
+.vscode/
+.gitignore
+README.md
+CHANGELOG.md
+VERSIONING.md
+docs/

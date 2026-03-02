@@ -1,0 +1,61 @@
+.container {
+  padding: 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+.columns {
+  display: flex;
+  gap: 1rem;
+}
+
+.left,
+.right {
+  flex: 1;
+}
+
+.json-editor {
+  margin-bottom: 1rem;
+}
+
+.json-editor textarea {
+  width: 100%;
+  font-family: monospace;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.error {
+  color: red;
+  margin-top: 0.5rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.badge.green {
+  background-color: green;
+}
+
+.badge.yellow {
+  background-color: goldenrod;
+}
+
+.badge.red {
+  background-color: red;
+}
+
+/* primary badge variant (e.g. consolidated collapse) */
+.badge.primary {
+  font-size: 1.25em;
+  padding: 0.35rem 0.7rem;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}

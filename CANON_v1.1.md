@@ -1,70 +1,58 @@
-# SupportingBases Core Engine
+# SupportingBases Core Engine — Canon v1.1
+**Status:** FROZEN — v1.1.0
 
-## Canon v1.1 — Structural Logistic Model
+## Propósito
+Motor determinístico stateless de análise estrutural e projeção temporal com classificação sistêmica de risco financeiro.
+Não persiste estado, não executa ações, não depende de UI, não depende de banco.
 
-**Status**
+## Invariantes (imutáveis)
+- Determinístico e stateless.
+- Layer 1 > Layer 2 > Layer 3 (peso).
+- Atraso nunca reduz peso.
+- Engine nunca depende de calendário fixo (apenas usa datas fornecidas).
+- Engine nunca toma decisão executável; apenas emite análise.
+- Violação de invariantes => bump major.
 
-Frozen – Stable
+## Fórmulas oficiais (v1.1)
 
-### 1. Determinism
+### Structural ratio
+`structural_ratio = total_weighted_pressure / available_cash`
 
-The engine is:
+### Structural index (logistic)
+`structural_index = 100 * (ratio^2 / (1 + ratio^2))`
 
-- 100% deterministic
-- Stateless
-- Side-effect free
-- Pure input → output
+Regras:
+- if available_cash <= 0 => structural_index = 100
+- clamp [0,100]
+- precisão: 1 casa decimal
 
-### 2. Nominal Collapse Index
+### Nominal index (operacional)
+Simulação sequencial de liquidez (amount nominal) em horizonte configurável.
+Colapso nominal ocorre quando liquidity < 0 em algum dia do horizonte.
+Mapping (0..100):
+- se colapsa no horizonte => 100
+- senão => escala pelo "pior stress" no horizonte (max daily outflow vs cash), com clamp [0..99]
 
-Sequential liquidity simulation ordered by `due_date`.
+### Consolidated index
+Regras:
+- if nominal_index >= 80 => consolidated = nominal
+- else if structural_index >= 90 => consolidated = structural
+- else consolidated = round(nominal*0.6 + structural*0.4)
 
-Nominal collapse occurs when liquidity < 0.
+## Pipeline oficial
+1) validar SBInput (runtime)
+2) expandir recorrências no horizonte
+3) aplicar penalidade por atraso (late multiplier)
+4) aplicar pesos por camada
+5) consolidar por centers (pressões locais)
+6) clusterizar obrigações em ondas de pressão
+7) simular liquidez nominal e estrutural
+8) identificar ZPF global (primeiro dia do cluster dominante / alta pressão)
+9) calcular collapse dates (nominal e structural)
+10) calcular índices (nominal, structural, consolidated)
+11) emitir SBOutput
 
-Index formula:
-
-```
-nominal_index = proximity to collapse within horizon (0–100)
-```
-
-### 3. Structural Collapse Index (Logistic Model)
-
-```
-structural_ratio = total_weighted_pressure / available_cash
-```
-
-```
-structural_index = 100 * (ratio² / (1 + ratio²))
-```
-
-Rules:
-
-- `available_cash <= 0` → `structural_index = 100`
-- result clamped 0–100
-
-### 4. Consolidated Collapse Index
-
-Priority logic:
-
-```
-if nominal_index >= 80:
-    consolidated = nominal_index
-else if structural_index >= 90:
-    consolidated = structural_index
-else:
-    consolidated = nominal_index * 0.6 + structural_index * 0.4
-```
-
-### 5. Invariants
-
-- Layer 1 weight > Layer 2 > Layer 3
-- Late never reduces weight
-- Engine never executes decisions
-- Engine never depends on calendar cycles
-- Engine never stores history
-
-### 6. Output Contract
-
-SBOutput v1.1 is stable.
-
-Breaking changes require major version bump.
+## Versionamento
+- major: quebra de contrato/invariantes
+- minor: extensões compatíveis
+- patch: correções internas/testes
