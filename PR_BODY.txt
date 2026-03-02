@@ -1,0 +1,10 @@
+Upgrade Structural Collapse Index to Canon v1.1
+
+Changes:
+- core: `src/risk/collapse-v1.ts` — replace linear mapping with logistic formula `structural_index = 100 * (ratio^2 / (1+ratio^2))`, handle `available_cash <= 0`, clamp result and preserve deterministic behavior.
+- lab: `supportingbases-lab/src/components/MetricBadge.tsx` — show one decimal when value is fractional for better precision display.
+- doc: `CANON_v1.1.md` — new canonical specification document.
+
+Tests: All vitest tests passed locally (22 passed).
+
+Please review and merge.
